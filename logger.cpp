@@ -1,7 +1,7 @@
 #include "includes.h"
 #include "logger.h"
 
-void logger(enum _logger_level level, char *msg, ...) {
+void logger(enum _logger_level level, const char *msg, ...) {
 	va_list args;
 
 	switch(level) {

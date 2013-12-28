@@ -9,7 +9,7 @@ enum _logger_level {
 	FATAL
 };
 
-void logger(enum _logger_level level, char *msg, ...);
+void logger(enum _logger_level level, const char *msg, ...);
 
 #endif /* __H_LOGGER_ */
 
