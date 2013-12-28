@@ -1,3 +1,4 @@
+#include "engine.h"
 #include "includes.h"
 #include "video.h"
 
@@ -7,7 +8,7 @@ int main(int argc, char **argv) {
 
 	if( video_init() != true ) return(-1);
 
-	
+	engine_run();
 
 	video_close();
 
