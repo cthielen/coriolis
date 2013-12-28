@@ -13,7 +13,9 @@ bool video_init(void) {
 		return(false);
 	}
 
-	screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, 16, 0 );
+	/* Purposefully use software surfaces as we'll be emulating DOS-style drawing with lots *
+         * of pixel access. */
+	screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_SWSURFACE );
 	if( screen == NULL ) {
 		logger( FATAL, "Could not set video mode: %s", SDL_GetError() );
 		return(false);
@@ -45,5 +47,72 @@ void video_blank_screen(void) {
 	fullscreen_rect.h = SCREEN_HEIGHT;
 
 	SDL_FillRect(screen, &fullscreen_rect, video_color_black);
+}
+
+/* Borrowed from http://sdl.beuc.net/sdl.wiki/Pixel_Access */
+void video_put_pixel(int x, int y, Uint32 color) {
+	int bpp = screen->format->BytesPerPixel;
+
+	SDL_LockSurface(screen);
+
+	Uint8 *p = (Uint8 *)screen->pixels + y * screen->pitch + x * bpp;
+
+	switch(bpp) {
+		case 1:
+			*p = color;
+			break;
+		case 2:
+			*(Uint16 *)p = color;
+			break;
+		case 3:
+			if(SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+				p[0] = (color >> 16) & 0xff;
+				p[1] = (color >> 8) & 0xff;
+				p[2] = color & 0xff;
+			} else {
+				p[0] = color & 0xff;
+				p[1] = (color >> 8) & 0xff;
+				p[2] = (color >> 16) & 0xff;
+			}
+			break;
+		case 4:
+			*(Uint32 *)p = color;
+			break;
+	}
+
+	SDL_UnlockSurface(screen);
+}
+
+/* Borrowed from http://sdl.beuc.net/sdl.wiki/Pixel_Access */
+Uint32 video_get_pixel(int x, int y) {
+	int bpp = screen->format->BytesPerPixel;
+
+	SDL_LockSurface(screen);
+
+	Uint8 *p = (Uint8 *)screen->pixels + y * screen->pitch + x * bpp;
+	Uint32 pixel;
+
+	switch(bpp) {
+		case 1:
+			pixel = *p;
+			break;
+		case 2:
+			pixel = *(Uint16 *)p;
+			break;
+		case 3:
+			if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+				pixel = p[0] << 16 | p[1] << 8 | p[2];
+			else
+				pixel = p[0] | p[1] << 8 | p[2] << 16;
+			break;
+		case 4:
+			pixel = *(Uint32 *)p;
+			break;
+		default:
+			pixel = 0;
+			break;
+	}
+
+	return pixel;
 }
 
