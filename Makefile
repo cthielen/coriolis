@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=`sdl-config --cflags` -Wall
 LIBS=`sdl-config --libs`
-OBJS=main.o video.o logger.o engine.o input.o point.o screen.o
+OBJS=main.o video.o logger.o engine.o input.o point.o screen.o vector.o
 
 default: $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o coriolis $(LIBS)
@@ -30,4 +30,7 @@ point.o: point.cpp point.h
 
 screen.o: screen.cpp screen.h point.h
 	$(CC) $(CFLAGS) -c screen.cpp
+
+vector.o: vector.cpp vector.h
+	$(CC) $(CFLAGS) -c vector.cpp
 
