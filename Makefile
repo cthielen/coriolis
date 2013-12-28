@@ -28,6 +28,6 @@ input.o: input.cpp input.h includes.h
 point.o: point.cpp point.h
 	$(CC) $(CFLAGS) -c point.cpp
 
-screen.o: screen.cpp screen.h
+screen.o: screen.cpp screen.h point.h
 	$(CC) $(CFLAGS) -c screen.cpp
 
